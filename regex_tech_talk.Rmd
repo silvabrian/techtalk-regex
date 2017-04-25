@@ -1,0 +1,192 @@
+---
+title: "Regular Expressions Tech Talk"
+output: html_notebook
+---
+
+### Introduction
+
+_Regular expressions are a notation for describing sets of character strings_
+
+#### Possible reasons people don’t learn regex
+
+  - They don’t realize all of the places they could be using regular expressions until they actually know how to use them
+  - They have seen something that looks like this: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+
+#### What We'll Cover
+
+  - Background
+  - Regex basics
+  - Modifying multiple similar (but different) parts of a string
+  - Extracting something from a string based on the characters around it
+  - Multiple places you can use regex
+
+### Background
+
+#### Regex Engines
+
+  - POSIX Basic Regular Expressions ([BRE](https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended))
+  - POSIX Extended Regular Expressions ([ERE](https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended))
+    - This is what R uses by default
+  - Perl Compatible Regular Expressions ([PCRE](https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions))
+    - R has the ability to use this and it is encouraged
+    - Python, Java, Javascript
+    
+We're going to focus on Perl because it is pretty similar for most things.
+
+
+### Regex Basics
+
+We'll setup a function to test this stuff out easily
+```{r}
+
+findAll <- function(pattern, x) {
+  
+  regmatches(x = x, 
+             m = gregexpr(pattern = pattern, 
+                          text = x, 
+                          perl = T))[[1]]
+  
+}
+
+```
+
+To start, we're going to be matching text from the following string
+```{r}
+x <- 'the cat walked down the slippery catwalk'
+```
+
+We can very simply find the word 'cat' twice
+```{r}
+findAll(pattern = 'cat', x = x)
+```
+
+#### Special Characters
+
+##### Dot
+We can match 'cat' followed by any character
+```{r}
+findAll(pattern = 'cat.', x = x)
+```
+
+##### Brackets
+We can match a character from a set of characters
+```{r}
+findAll(pattern = '[abc]', x = x)
+```
+
+Combining what we have seen so far
+```{r}
+findAll(pattern = '[abc].', x = x)
+```
+
+Within the brackets, you can also define ranges
+```{r}
+findAll(pattern = '[a-z]', x = x)
+```
+
+##### Caret
+We can negate characters in square brackets
+```{r}
+findAll(pattern = '[^abc]', x = x)
+```
+
+##### Caret (Again) and Dollar Sign
+Outside of square brackets, we can indicate the beginning of a string
+```{r}
+findAll(pattern = '^the ...', x = x)
+```
+
+Note that if we took out the caret, we would have two matches
+
+Similarly, we can indicate the end of the string
+```{r}
+findAll(pattern = '...walk$', x = x)
+```
+
+##### Asterisk and Plus Sign
+We can match either 0 or more of the previous character
+```{r}
+findAll(pattern = 'slip*ery', x = x)
+```
+
+Similarly, we can match either 1 or more of the previous character
+```{r}
+findAll(pattern = 'slip+ery', x = x)
+```
+
+Note that this can be useful when you have an arbitrary number of repeated characters
+
+For example, the following will match the whole string
+```{r}
+findAll(pattern = '.*', x = x)
+```
+
+##### Curly Bracket
+We can match between m and n more of the previous character
+```{r}
+findAll(pattern = '.{1,3}', x = x)
+```
+
+##### Shorthand Characters
+You can use the following instead of using characters directly
+```
+\\w Word characters
+\\W Non-word characters
+\\d Digit characters
+\\D Non-digit characters
+\\s Whitespace characters
+\\S Non-whitespace characters
+\\v Vertical whitespace characters
+\\V Non-vertical whitespace characters
+\\h Horizontal whitespace characters
+\\H Non-horizontal whitespace characters
+```
+
+##### Parentheses and Pipe
+We can match with 'OR' conditions
+```{r}
+findAll(pattern = 'the (cat|slippery)', x = x)
+```
+
+With parentheses, can run subexpressions and capture their output
+NOTE: R does not do a great job of this
+One option using base R
+```{r}
+gsub(pattern = 'the ([a-z]+)', 
+     replacement = 'the \\U\\1', # \\U for uppercase \\1 for matching the first group
+     x = x, 
+     perl = T)
+```
+
+##### Lookbehind
+We can match one pattern and then look for additional matches before
+Note that we no longer need the 'the ' in the replacement
+```{r}
+gsub(pattern = '(?<=the )([a-z]+)', 
+     replacement = '\\U\\1', # \\U for uppercase \\1 for matching the first group
+     x = x, 
+     perl = T)
+```
+
+##### Lookahead
+We can match one pattern and then look for additional matches after
+```{r}
+gsub(pattern = '([a-z]+ )(?=cat\\s)', 
+     replacement = '\\U\\1', # \\U for uppercase \\1 for matching the first group
+     x = x, 
+     perl = T)
+```
+
+#### Practice
+To practice the basics, check out https://regexone.com/, which has a bunch of interactive examples.
+
+#### Where to use Regex
+
+You can use regex in a number of places
+
+- [R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html)
+- [Python](https://docs.python.org/2/library/re.html)
+- [Sublime](http://docs.sublimetext.info/en/latest/search_and_replace/search_and_replace_overview.html#using-regular-expressions-in-sublime-text)
+- [Rstudio](https://www.r-bloggers.com/regular-expressions-in-r-vs-rstudio/)
+- [vim](http://vimregex.com/), [sed](https://www.tutorialspoint.com/unix/unix-regular-expressions.htm)
+- [Vimium](http://vimium.github.io/)

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "x <- 'the cat walked down the slippery catwalk'\n\nfindAll <- function(pattern, x) {\n  \n  regmatches(x = x, \n             m = gregexpr(pattern = pattern, \n                          text = x, \n                          perl = T))[[1]]\n  \n}\n\n\n# Can use it to simply find 'cat' twice in the string\nfindAll(pattern = 'cat', x = x)\n# ^ Could be useful in very simple cases\n\n# Lets get into special characters\n\n\n# Dot\n# We can match 'cat' followed by any character\nfindAll(pattern = 'cat.', x = x)\n\n# Brackets\n# We can match a character from a set of characters\nfindAll(pattern = '[abc]', x = x)\n\n# Combining what we have seen so far\nfindAll(pattern = '[abc].', x = x)\n\n# Within the brackets, you can also define ranges\nfindAll(pattern = '[a-z]', x = x)\n\n# Caret\n# We can negate characters in square brackets\nfindAll(pattern = '[^abc]', x = x)\n\n# Caret (again) and dollar sign\n# Outside of square brackets, we can indicate the beginning of a string\nfindAll(pattern = '^the ...', x = x)\n# ^ Note that if we took out the caret, we would have two matches\n\n# Similarly, we can indicate the end of the string\nfindAll(pattern = '...walk$', x = x)\n\n# Asterisk and plus sign\n# We can match either 0 or more of the previous character\nfindAll(pattern = 'slip*ery', x = x)\n\n# Similarly, we can match either 1 or more of the previous character\nfindAll(pattern = 'slip+ery', x = x)\n\n# Note that this can be useful when you have an arbitrary number of repeated characters\n# For example, the following will match the whole string\nfindAll(pattern = '.*', x = x)\n\n# Curly bracket\n# We can match between m and n more of the previous character\nfindAll(pattern = '.{1,3}', x = x)\n\n# Parenthesis and newline\n# We can run subexpressions and capture their output\n# NOTE: R does not do a great job of this\n# One option using base R\n\n",
+    "created" : 1484082445685.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2978305195",
+    "id" : "22F7DFEA",
+    "lastKnownWriteTime" : 1484089709,
+    "last_content_update" : 1484089709885,
+    "path" : "~/repos/techtalk-regex/regex_demo.R",
+    "project_path" : "regex_demo.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
